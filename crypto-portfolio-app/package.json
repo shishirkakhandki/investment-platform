@@ -1,0 +1,5 @@
+{
+  "name": "crypto-portfolio-app",
+  "private": true,
+  "workspaces": ["services/*"]
+}
