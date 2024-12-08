@@ -6,8 +6,12 @@ export default function CryptoList() {
 
   useEffect(() => {
     const fetchPrices = async () => {
-      const { data } = await apiClient.get('/cryptocurrency/top-prices');
-      setPrices(data);
+      try {
+        const { data } = await apiClient.get('/workflow/crypto/top10'); // Updated endpoint
+        setPrices(data);
+      } catch (error) {
+        console.error("Error fetching top cryptos", error);
+      }
     };
     fetchPrices();
   }, []);

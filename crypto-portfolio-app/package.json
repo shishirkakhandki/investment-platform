@@ -1,5 +1,13 @@
 {
   "name": "crypto-portfolio-app",
   "private": true,
-  "workspaces": ["services/*"]
+  "workspaces": [
+    "services/*"
+  ],
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/mongoose": "^10.0.0",
+    "typescript": "^5.0.0"
+  }
 }

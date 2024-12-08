@@ -3,22 +3,38 @@ import axios from 'axios';
 
 @Injectable()
 export class WorkflowService {
+  private readonly userServiceUrl = 'http://localhost:3003/user';
+  private readonly cryptoServiceUrl = 'http://localhost:3000/crypto';
+
   async getPortfolioDetails(userId: string) {
-    // Step 1: Fetch User Details
-    const user = await axios.get(`http://user-service:3000/user/${userId}`);
-    if (!user) throw new Error('User not found');
+    const user = await axios.get(`${this.userServiceUrl}/${userId}`);
+    const cryptoPrices = await axios.get(`${this.cryptoServiceUrl}/prices`);
+    return { user: user.data, cryptoPrices: cryptoPrices.data };
+  }
 
-    // Step 2: Fetch Cryptocurrency Prices
-    const cryptoPrices = await axios.get('http://cryptocurrency-service:3001/crypto/prices');
+  async getPortfolioValue(userId: string) {
+    const portfolioDetails = await this.getPortfolioDetails(userId);
+    // Calculate portfolio value logic
+    return { portfolioValue: portfolioDetails };
+  }
 
-    // Step 3: Fetch Portfolio Details
-    const portfolio = await axios.get(`http://portfolio-service:3002/portfolio/${userId}`);
+  async getTopCryptos() {
+    const response = await axios.get(`${this.cryptoServiceUrl}/top10`);
+    return response.data;
+  }
 
-    // Combine all data
-    return {
-      user: user.data,
-      portfolio: portfolio.data,
-      cryptoPrices: cryptoPrices.data,
-    };
+  async signup(body: { username: string; userId: string; password: string }) {
+    const response = await axios.post(`${this.userServiceUrl}/signup`, body);
+    return response.data;
+  }
+
+  async login(body: { userId: string; password: string }) {
+    const response = await axios.post(`${this.userServiceUrl}/login`, body);
+    return response.data;
+  }
+
+  async updatePassword(body: { userId: string; oldPassword: string; newPassword: string }) {
+    const response = await axios.post(`${this.userServiceUrl}/password`, body);
+    return response.data;
   }
 }

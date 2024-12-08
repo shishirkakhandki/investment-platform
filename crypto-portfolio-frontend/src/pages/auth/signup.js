@@ -4,7 +4,7 @@ import { TextField, Button, Container, Typography, Grid, Box } from '@mui/materi
 import apiClient from '../../../utils/api';
 
 export default function Signup() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', userId: '', password: '' });
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -15,10 +15,10 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await apiClient.post('/user/signup', formData);
+      await apiClient.post('/workflow/signup', formData); // Updated endpoint
       router.push('/auth/login');
     } catch (err) {
-      console.error(err.response.data.message);
+      console.error("Signup error", err.response?.data?.message || err.message);
     }
   };
 
@@ -39,8 +39,18 @@ export default function Signup() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                name="email"
-                label="Email Address"
+                name="username"
+                label="Username"
+                variant="outlined"
+                required
+                fullWidth
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="userId"
+                label="User Id"
                 variant="outlined"
                 required
                 fullWidth
