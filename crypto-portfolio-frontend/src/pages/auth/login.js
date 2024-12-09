@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { TextField, Button, Container, Typography, Box, Grid } from '@mui/material';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Login() {
   const { login } = useAuth();

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getPortfolio, getPortfolioValue, getTopCryptos, getCryptoHistory } from '../../utils/api';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -102,13 +102,15 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-  
       <main className="dashboard-main">
         <h1>Your Portfolio</h1>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-        {portfolio ? (
+        {/* Display loading state only after wallet is connected */}
+        {!walletConnected ? (
+          <p>Connecting wallet...</p>
+        ) : portfolio ? (
           <div className="portfolio-container">
             <section className="overview-section">
               <h2>Portfolio Overview</h2>

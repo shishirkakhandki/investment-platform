@@ -1,0 +1,23 @@
+# Use official Node.js image
+FROM node:16
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and yarn.lock
+COPY package*.json ./
+
+# Install dependencies
+RUN yarn install
+
+# Copy the rest of the application
+COPY . .
+
+# Build the application
+RUN yarn build
+
+# Expose the port the app runs on
+EXPOSE 3005
+
+# Start the app
+CMD ["yarn", "start"]

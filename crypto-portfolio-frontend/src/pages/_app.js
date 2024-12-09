@@ -1,7 +1,7 @@
 import "../styles/globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { AuthProvider } from '../pages/AuthContext'; // Update the path to your context
+import { AuthProvider } from '../contexts/AuthContext'; // Update the path to your context
 
 function MyApp({ Component, pageProps }) {
   return (

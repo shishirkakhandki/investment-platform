@@ -1,0 +1,23 @@
+# Use the official Node.js image (you can change the version based on your needs)
+FROM node:16
+
+# Set the working directory to the app's directory
+WORKDIR /app
+
+# Copy package.json and yarn.lock (if you use yarn)
+COPY package*.json ./
+
+# Install dependencies
+RUN yarn install
+
+# Copy the rest of the source code (e.g., src, dist, etc.)
+COPY . .
+
+# Build the application (assuming you're using TypeScript)
+RUN yarn build
+
+# Expose the port the service will run on (change if necessary)
+EXPOSE 3004
+
+# Start the application (you can replace with your start command)
+CMD ["yarn", "start"]

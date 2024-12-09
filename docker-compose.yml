@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Frontend service
+  frontend:
+    build:
+      context: ./crypto-portfolio-frontend   # Relative path
+    ports:
+      - "3005:3005"  # Expose port 3005 for frontend
+    networks:
+      - app-network
+    depends_on:
+      - cryptocurrency
+      - notification
+      - workflow
+      - user
+      - portfolio
+
+  # Cryptocurrency microservice
+  cryptocurrency:
+    build:
+      context: ./services/cryptocurrency  # Relative path
+    ports:
+      - "3000:3000"  # Expose port 3000 for cryptocurrency service
+    networks:
+      - app-network
+
+  # Notification microservice
+  notification:
+    build:
+      context: ./services/notification  # Relative path
+    ports:
+      - "3001:3001"  # Expose port 3001 for notification service
+    networks:
+      - app-network
+
+  # Workflow microservice
+  workflow:
+    build:
+      context: ./services/workflow  # Relative path
+    ports:
+      - "3002:3002"  # Expose port 3002 for workflow service
+    networks:
+      - app-network
+
+  # User microservice
+  user:
+    build:
+      context: ./services/user  # Relative path
+    ports:
+      - "3003:3003"  # Expose port 3003 for user service
+    networks:
+      - app-network
+
+  # Portfolio microservice
+  portfolio:
+    build:
+      context: ./services/portfolio  # Relative path
+    ports:
+      - "3004:3004"  # Expose port 3004 for portfolio service
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
