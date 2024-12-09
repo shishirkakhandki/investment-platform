@@ -12,9 +12,17 @@ export class UserService {
   ) {}
 
   // Create a new user
-  async createUser(username: string, userId: string, password: string): Promise<User> {
+  async createUser(
+    username: string,
+    userId: string,
+    password: string,
+  ): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
-    return this.userRepository.createUser({ username, userId, password: hashedPassword });
+    return this.userRepository.createUser({
+      username,
+      userId,
+      password: hashedPassword,
+    });
   }
 
   // Validate a user for login and generate JWT token
@@ -27,7 +35,11 @@ export class UserService {
   }
 
   // Update user password
-  async updatePassword(userId: string, oldPassword: string, newPassword: string): Promise<boolean> {
+  async updatePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<boolean> {
     const user = await this.userRepository.findByUserId(userId);
     if (!user || !(await bcrypt.compare(oldPassword, user.password))) {
       return false;

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getPortfolio, getPortfolioValue, getTopCryptos, getCryptoHistory } from '../../utils/api';
-import Header from '../components/Header';
 import { useAuth } from './AuthContext';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
@@ -31,10 +30,8 @@ export default function Dashboard() {
       const history = {};
       const range = '7d'; // Example: Fetch data for the last 7 days
       for (const id of cryptoIds) {
-        console.log("Fetching historical data for", { symbol: id, range });
   
         const data = await getCryptoHistory(id, range); // Pass both `id` and `range`
-        console.log("Data: "+JSON.stringify(data))
         history[id] = data.data; // Assume `prices` is an array of [timestamp, price] pairs
       }
       setPriceHistory(history);
@@ -74,7 +71,6 @@ export default function Dashboard() {
           : 'https://web3.blockxnet.com';
 
       const portfolioData = await getPortfolio(userId, walletAddress, providerUrl, tokenAddresses);
-      console.log("Portdolio data: "+JSON.stringify(portfolioData))
       
       setPortfolio(portfolioData.data || { holdings: [] });
 
@@ -105,81 +101,105 @@ export default function Dashboard() {
   }, [userId, router]);
 
   return (
-    <div>
-      <main>
+    <div className="dashboard">
+  
+      <main className="dashboard-main">
         <h1>Your Portfolio</h1>
 
-        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
 
         {portfolio ? (
-          <div>
-            <h2>Portfolio Overview</h2>
-            <p>Total Portfolio Value: ${portfolioValue || 0}</p>
+          <div className="portfolio-container">
+            <section className="overview-section">
+              <h2>Portfolio Overview</h2>
+              <p>Total Portfolio Value: ${portfolioValue || 0}</p>
+            </section>
 
-            <h3>Your Tokens</h3>
-            <ul>
+            <section className="tokens-section">
+              <h3>Your Tokens</h3>
               {portfolio.holdings && portfolio.holdings.length > 0 ? (
-                portfolio.holdings.map((token) => (
-                  <li key={token.token}>
-                    {token.symbol}: {token.amount} tokens
-                  </li>
-                ))
+                <table className="tokens-table">
+                  <thead>
+                    <tr>
+                      <th>Token</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {portfolio.holdings.map((token) => (
+                      <tr key={token.token}>
+                        <td>{token.symbol}</td>
+                        <td>{token.amount} tokens</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
                 <p>No tokens found in your portfolio.</p>
               )}
-            </ul>
+            </section>
 
-            <h3>Top 10 Cryptocurrencies</h3>
-            <ul>
+            <section className="top-cryptos-section">
+              <h3>Top 10 Cryptocurrencies</h3>
               {topCryptos.length > 0 ? (
-                topCryptos.map((crypto) => (
-                  <li key={crypto.id}>
-                    {crypto.name} ({crypto.symbol}): ${crypto.current_price || 'N/A'}
-                  </li>
-                ))
+                <table className="top-cryptos-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Symbol</th>
+                      <th>Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topCryptos.map((crypto) => (
+                      <tr key={crypto.id}>
+                        <td>{crypto.name}</td>
+                        <td>{crypto.symbol}</td>
+                        <td>${crypto.current_price || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
-                <p>No cryptocurrencies found</p>
+                <p>No cryptocurrencies found.</p>
               )}
-            </ul>
+            </section>
 
-            <h3>Price Movements</h3>
-            {topCryptos.length > 0 && (
-              <div style={{ width: '80%', margin: 'auto' }}>
-                <Line
-                  data={{
-                    labels: priceHistory[topCryptos[0]?.id]?.map(item =>
-                      new Date(item.timestamp).toLocaleDateString()
-                    ),
-                    datasets: topCryptos.map((crypto, index) => ({
-                      label: crypto.name,
-                      data: priceHistory[crypto.id]?.map(item => item.price),  // Access price directly
-                      borderColor: `hsl(${(index / 10) * 360}, 70%, 50%)`,
-                      fill: false,
-                    })),
-                  }}
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        position: 'top',
+            <section className="chart-section">
+              <h3>Price Movements</h3>
+              {topCryptos.length > 0 && (
+                <div className="chart-container">
+                  <Line
+                    data={{
+                      labels: priceHistory[topCryptos[0]?.id]?.map(item =>
+                        new Date(item.timestamp).toLocaleDateString()
+                      ),
+                      datasets: topCryptos.map((crypto, index) => ({
+                        label: crypto.name,
+                        data: priceHistory[crypto.id]?.map(item => item.price),
+                        borderColor: `hsl(${(index / 10) * 360}, 70%, 50%)`,
+                        fill: false,
+                      })),
+                    }}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Price Movements of Top 10 Cryptocurrencies' },
                       },
-                      title: {
-                        display: true,
-                        text: 'Price Movements of Top 10 Cryptocurrencies',
-                      },
-                    },
-                  }}
-                />
-              </div>
-            )}
+                    }}
+                  />
+                </div>
+              )}
+            </section>
           </div>
         ) : (
           <p>Loading portfolio...</p>
         )}
 
-        <div>
+        <div className="wallet-connect-section">
           {!walletConnected ? (
-            <button onClick={connectWalletAndFetchData}>Connect to Wallet</button>
+            <button onClick={connectWalletAndFetchData} className="connect-button">Connect to Wallet</button>
           ) : (
             <div>
               <p>Wallet Connected: {walletAddress}</p>

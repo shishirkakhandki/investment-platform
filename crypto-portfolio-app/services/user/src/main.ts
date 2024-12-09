@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 
-
 async function bootstrap() {
   try {
     const app = await NestFactory.create(UserModule);
@@ -20,7 +19,7 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-bootstrap().catch(error => {
+bootstrap().catch((error) => {
   console.error('Bootstrap error:', error);
   process.exit(1);
 });

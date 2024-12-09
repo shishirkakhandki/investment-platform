@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  HttpException,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
 
 @Controller('workflow')
@@ -12,12 +21,13 @@ export class WorkflowController {
     @Query('providerUrl') providerUrl: string,
     @Query('tokenAddresses') tokenAddresses: string[],
   ) {
-    console.log(`Received request for user ${userId}`);
-    console.log(`Wallet Address: ${walletAddress}`);
-    console.log(`Provider URL: ${providerUrl}`);
-    console.log(`Token Addresses: ${tokenAddresses}`);
     try {
-      return await this.workflowService.getPortfolioDetails(userId, walletAddress, providerUrl, tokenAddresses);
+      return await this.workflowService.getPortfolioDetails(
+        userId,
+        walletAddress,
+        providerUrl,
+        tokenAddresses,
+      );
     } catch (error) {
       console.error('Error in WorkflowController:', error.message);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -33,7 +43,12 @@ export class WorkflowController {
     @Query('tokenAddresses') tokenAddresses: string[],
   ) {
     try {
-      return await this.workflowService.calculatePortfolioValue(userId, walletAddress, providerUrl, tokenAddresses);
+      return await this.workflowService.calculatePortfolioValue(
+        userId,
+        walletAddress,
+        providerUrl,
+        tokenAddresses,
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -42,7 +57,7 @@ export class WorkflowController {
   @Get('crypto/top10')
   async getTopCryptos() {
     try {
-      const ans =  await this.workflowService.getTopCryptos();
+      const ans = await this.workflowService.getTopCryptos();
       return { data: ans };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -50,7 +65,9 @@ export class WorkflowController {
   }
 
   @Post('signup')
-  async signup(@Body() body: { username: string; userId: string; password: string }) {
+  async signup(
+    @Body() body: { username: string; userId: string; password: string },
+  ) {
     try {
       return await this.workflowService.signup(body);
     } catch (error) {
@@ -78,17 +95,18 @@ export class WorkflowController {
     }
   }
 
-
   @Get('crypto/historical')
   async getCryptoHistory(
     @Query('symbol') symbol: string,
     @Query('range') range: string,
   ) {
-    console.log(`Received request for historical data: symbol=${symbol}, range=${range}`);
     try {
       return await this.workflowService.getCryptoHistory(symbol, range);
     } catch (error) {
-      console.error('Error in WorkflowController (getCryptoHistory):', error.message);
+      console.error(
+        'Error in WorkflowController (getCryptoHistory):',
+        error.message,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }

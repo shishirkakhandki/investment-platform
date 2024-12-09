@@ -28,7 +28,6 @@ export default function Login() {
   
     const success = await login(formData);
     if (success) {
-      console.log('Login successful');
       setErrorMessage('');
       setTimeout(() => router.push('/dashboard'), 100); // Redirect to dashboard
     } else {

@@ -1,11 +1,20 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Get, Param, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Put,
+  Get,
+  Param,
+  Logger,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   private readonly logger = new Logger(UserController.name);
-
 
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
@@ -60,7 +69,11 @@ export class UserController {
     @Body() body: { userId: string; oldPassword: string; newPassword: string },
   ) {
     const { userId, oldPassword, newPassword } = body;
-    const result = await this.userService.updatePassword(userId, oldPassword, newPassword);
+    const result = await this.userService.updatePassword(
+      userId,
+      oldPassword,
+      newPassword,
+    );
     if (!result) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }

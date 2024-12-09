@@ -3,3 +3,81 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: #f5f5f5;
 }
+
+
+.dashboard {
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.dashboard-main {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+}
+
+.portfolio-container {
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
+}
+
+section {
+  margin-bottom: 30px;
+}
+
+h2, h3 {
+  color: #333;
+}
+
+.tokens-section table, .top-cryptos-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table th, table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.chart-container {
+  width: 80%;
+  margin: auto;
+}
+
+.wallet-connect-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.connect-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px 32px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.connect-button:hover {
+  background-color: #45a049;
+}

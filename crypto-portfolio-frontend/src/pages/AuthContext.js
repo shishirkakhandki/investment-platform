@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await loginApi(credentials); // Attempt the API login
-      console.log('API response:', response);
       setUserId(credentials.userId);
       localStorage.setItem('userId', credentials.userId); // Store userId in localStorage
       return true; // Login successful

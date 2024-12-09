@@ -18,11 +18,12 @@ export class WorkflowService {
       const queryParams = new URLSearchParams();
       queryParams.append('walletAddress', walletAddress);
       queryParams.append('providerUrl', providerUrl); // Avoid double encoding
-      tokenAddresses.forEach((address) => queryParams.append('tokenAddresses', address)); // Or use .join(',') if needed
-  
+      tokenAddresses.forEach((address) =>
+        queryParams.append('tokenAddresses', address),
+      ); // Or use .join(',') if needed
+
       const portfolioUrl = `${this.portfolioServiceUrl}/${userId}?${queryParams.toString()}`;
-      console.log(`Constructed URL: ${portfolioUrl}`);
-  
+
       // Make the GET request directly to the portfolio service
       const response = await axios.get(portfolioUrl);
       return response.data; // Return the data from the portfolio service
@@ -46,23 +47,26 @@ export class WorkflowService {
       const queryParams = new URLSearchParams();
       queryParams.append('walletAddress', walletAddress);
       queryParams.append('providerUrl', providerUrl);
-      tokenAddresses.forEach((address) => queryParams.append('tokenAddresses', address));
+      tokenAddresses.forEach((address) =>
+        queryParams.append('tokenAddresses', address),
+      );
 
       const portfolioValueUrl = `${this.portfolioServiceUrl}/${userId}/value?${queryParams.toString()}`;
-      console.log(`Constructed URL for portfolio value: ${portfolioValueUrl}`);
 
       // Fetch portfolio value from PortfolioService
       const response = await axios.get(portfolioValueUrl);
       return response.data; // Return portfolio value from PortfolioService
     } catch (error) {
-      console.error('Error in WorkflowService (calculatePortfolioValue):', error.message);
+      console.error(
+        'Error in WorkflowService (calculatePortfolioValue):',
+        error.message,
+      );
       throw new HttpException(
         error.response?.data?.message || 'Failed to calculate portfolio value',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
-  
 
   async getTopCryptos() {
     try {
@@ -93,16 +97,20 @@ export class WorkflowService {
       const response = await axios.post(`${this.userServiceUrl}/login`, body);
       return response.data;
     } catch (error) {
-      throw new HttpException(
-        'Failed to log in user',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException('Failed to log in user', HttpStatus.UNAUTHORIZED);
     }
   }
 
-  async updatePassword(body: { userId: string; oldPassword: string; newPassword: string }) {
+  async updatePassword(body: {
+    userId: string;
+    oldPassword: string;
+    newPassword: string;
+  }) {
     try {
-      const response = await axios.post(`${this.userServiceUrl}/password`, body);
+      const response = await axios.post(
+        `${this.userServiceUrl}/password`,
+        body,
+      );
       return response.data;
     } catch (error) {
       throw new HttpException(
@@ -115,18 +123,20 @@ export class WorkflowService {
   async getCryptoHistory(symbol: string, range: string): Promise<any> {
     try {
       const url = `${this.cryptoServiceUrl}/historical`;
-      console.log(`Requesting historical data from CryptoService: ${url}`);
 
       const response = await axios.get(url, {
         params: { symbol, range },
       });
 
-      console.log('Received response from CryptoService:', response.data);
       return response.data; // Return the data as is
     } catch (error) {
-      console.error('Error in WorkflowService (getCryptoHistory):', error.message);
+      console.error(
+        'Error in WorkflowService (getCryptoHistory):',
+        error.message,
+      );
       throw new HttpException(
-        error.response?.data?.message || 'Failed to fetch cryptocurrency history',
+        error.response?.data?.message ||
+          'Failed to fetch cryptocurrency history',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

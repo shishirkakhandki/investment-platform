@@ -10,7 +10,7 @@ export class CryptocurrencyService {
       );
       return data;
     } catch (error) {
-      throw new Error('Error fetching cryptocurrency prices');
+      throw new Error('Error fetching cryptocurrency prices: ' + error);
     }
   }
 
@@ -48,16 +48,12 @@ export class CryptocurrencyService {
       if (!symbol || !range) {
         throw new Error('Symbol and range are required.');
       }
-  
-      console.log('Fetching historical data for:', { symbol, range });
-  
+
       const { data } = await axios.get(
         `${this.BASE_URL}/coins/${symbol}/market_chart`,
         { params: { vs_currency: 'usd', days: range } },
       );
-  
-      console.log('API Response:', data);
-  
+
       return data.prices.map(([timestamp, price]) => ({
         timestamp,
         price,
@@ -71,6 +67,4 @@ export class CryptocurrencyService {
       throw new Error('Unable to fetch historical prices at this time.');
     }
   }
- 
-  
 }
