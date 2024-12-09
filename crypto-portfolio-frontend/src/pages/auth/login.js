@@ -1,60 +1,31 @@
-import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import apiClient, { setAuthToken } from '../../../utils/api';
+import { useAuth } from '../AuthContext';
 
 export default function Login() {
-  const [formData, setFormData] = useState({ userId: '', password: '' });
+  const { login } = useAuth();
   const router = useRouter();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const { data } = await apiClient.post('/workflow/login', formData); // Updated endpoint
-      setAuthToken(data.token); // Set token for subsequent API requests
-      localStorage.setItem('token', data.token);
-      router.push('/dashboard');
-    } catch (err) {
-      console.error("Login error", err.response?.data?.message || err.message);
+    const formData = {
+      userId: e.target.userId.value,
+      password: e.target.password.value,
+    };
+
+    const success = await login(formData);
+    if (success) {
+      console.log("Success")
+      setTimeout(() => router.push('/dashboard'), 100);// Redirect to dashboard
+    } else {
+      alert('Login failed. Please check your credentials.');
     }
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box mt={8}>
-        <Typography variant="h4" gutterBottom>
-          Login
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="User Id"
-            name="userId"
-            fullWidth
-            margin="normal"
-            required
-            onChange={handleChange}
-          />
-          <TextField
-            label="Password"
-            name="password"
-            type="password"
-            fullWidth
-            margin="normal"
-            required
-            onChange={handleChange}
-          />
-          <Box mt={4}>
-            <Button variant="contained" color="primary" fullWidth type="submit">
-              Login
-            </Button>
-          </Box>
-        </form>
-      </Box>
-    </Container>
+    <form onSubmit={handleSubmit}>
+      <input type="text" name="userId" placeholder="User ID" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
   );
 }

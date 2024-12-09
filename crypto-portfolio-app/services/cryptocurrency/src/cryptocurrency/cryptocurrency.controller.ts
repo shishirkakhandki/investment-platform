@@ -18,7 +18,7 @@ export class CryptocurrencyController {
   }
 
   // Endpoint to fetch historical prices for a given symbol and range
-  @Get('historical/bitcoin')
+  @Get('historical')
   async getHistoricalPrices(
     @Query('symbol') symbol: string,
     @Query('range') range: string,

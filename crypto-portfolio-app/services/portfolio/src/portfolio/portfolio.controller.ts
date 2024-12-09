@@ -1,28 +1,30 @@
-import { Body, Controller, Get, Param, Put } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PortfolioService } from './portfolio.service';
 
 @Controller('portfolio')
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
 
-  // Fetch the portfolio of a user
+  // Endpoint to fetch the portfolio using userId, walletAddress, providerUrl, and tokenAddresses
   @Get(':userId')
-  async getPortfolio(@Param('userId') userId: string) {
-    return await this.portfolioService.getPortfolio(userId);
-  }
-
-  // Fetch the total portfolio value in USD
-  @Get(':userId/value')
-  async getPortfolioValue(@Param('userId') userId: string) {
-    return await this.portfolioService.calculatePortfolioValue(userId);
-  }
-
-  // Store or update user portfolio
-  @Put(':userId')
-  async updatePortfolio(
+  async getPortfolio(
     @Param('userId') userId: string,
-    @Body() data: { walletAddress: string; providerUrl: string; tokenAddresses: string[] }
+    @Query('walletAddress') walletAddress: string,
+    @Query('providerUrl') providerUrl: string,
+    @Query('tokenAddresses') tokenAddresses: string[],
   ) {
-    return await this.portfolioService.updatePortfolio(userId, data.walletAddress, data.providerUrl, data.tokenAddresses);
+    console.log("User id: "+userId+" walletAddress: "+walletAddress+" providerUrl: "+providerUrl+" tokenAddresses: "+tokenAddresses)
+    return await this.portfolioService.getPortfolio(userId, walletAddress, providerUrl, tokenAddresses);
+  }
+  
+  // Endpoint to calculate portfolio value using the same parameters
+  @Get(':userId/value')
+  async getPortfolioValue(
+    @Param('userId') userId: string,
+    @Query('walletAddress') walletAddress: string,
+    @Query('providerUrl') providerUrl: string,
+    @Query('tokenAddresses') tokenAddresses: string[],
+  ) {
+    return await this.portfolioService.calculatePortfolioValue(userId, walletAddress, providerUrl, tokenAddresses);
   }
 }

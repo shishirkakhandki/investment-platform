@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Query } from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
 
 @Controller('workflow')
@@ -6,23 +6,44 @@ export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
 
   @Get('portfolio/:userId')
-  async getUserPortfolio(@Param('userId') userId: string) {
+  async getUserPortfolio(
+    @Param('userId') userId: string,
+    @Query('walletAddress') walletAddress: string,
+    @Query('providerUrl') providerUrl: string,
+    @Query('tokenAddresses') tokenAddresses: string[],
+  ) {
+    console.log(`Received request for user ${userId}`);
+    console.log(`Wallet Address: ${walletAddress}`);
+    console.log(`Provider URL: ${providerUrl}`);
+    console.log(`Token Addresses: ${tokenAddresses}`);
     try {
-      return await this.workflowService.getPortfolioDetails(userId);
+      return await this.workflowService.getPortfolioDetails(userId, walletAddress, providerUrl, tokenAddresses);
+    } catch (error) {
+      console.error('Error in WorkflowController:', error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  // New method for fetching portfolio value
+  @Get('portfolio/:userId/value')
+  async getPortfolioValue(
+    @Param('userId') userId: string,
+    @Query('walletAddress') walletAddress: string,
+    @Query('providerUrl') providerUrl: string,
+    @Query('tokenAddresses') tokenAddresses: string[],
+  ) {
+    try {
+      return await this.workflowService.calculatePortfolioValue(userId, walletAddress, providerUrl, tokenAddresses);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  @Get('portfolio/:userId/value')
-  async getCombinedPortfolioValue(@Param('userId') userId: string) {
-    return await this.workflowService.getPortfolioValue(userId);
-  }
-
   @Get('crypto/top10')
   async getTopCryptos() {
     try {
-      return await this.workflowService.getTopCryptos();
+      const ans =  await this.workflowService.getTopCryptos();
+      return { data: ans };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -33,7 +54,7 @@ export class WorkflowController {
     try {
       return await this.workflowService.signup(body);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

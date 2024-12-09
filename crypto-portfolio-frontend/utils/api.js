@@ -13,9 +13,22 @@ export const setAuthToken = (token) => {
 };
 
 // Workflow Service APIs
-export const getPortfolio = async (userId) => apiClient.get(`/workflow/portfolio/${userId}`);
-export const getPortfolioValue = async (userId) => apiClient.get(`/workflow/portfolio/${userId}/value`);
-export const getTopCryptos = async () => apiClient.get('/workflow/crypto/top10');
+
+// Fetch portfolio data by userId, walletAddress, providerUrl, and tokenAddresses
+export const getPortfolio = async (userId, walletAddress, providerUrl, tokenAddresses) => 
+  apiClient.get(`/workflow/portfolio/${userId}`, {
+    params: { walletAddress, providerUrl, tokenAddresses },
+  });
+
+// Get portfolio value using the same parameters
+export const getPortfolioValue = async (userId, walletAddress, providerUrl, tokenAddresses) => 
+  apiClient.get(`/workflow/portfolio/${userId}/value`, {
+    params: { walletAddress, providerUrl, tokenAddresses },
+  });
+
+export const getTopCryptos = async () => apiClient.get('/workflow/crypto/top10'); // All requests to the "workflow" endpoint
+
+// User Authentication APIs
 export const signup = async (data) => apiClient.post('/workflow/signup', data);
 export const login = async (data) => apiClient.post('/workflow/login', data);
 export const updatePassword = async (data) => apiClient.post('/workflow/password', data);

@@ -1,50 +1,84 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { ethers} from 'ethers';
+import { ethers } from 'ethers';
 
 @Injectable()
 export class PortfolioService {
-  // In-memory storage for portfolios (can be replaced with a DB in the future)
-  private portfolios = new Map<string, any>();
+  // Fetch portfolio data from the MetaMask wallet address directly
+  async getPortfolio(userId: string, walletAddress: string, providerUrl: string, tokenAddresses: string[]) {
+    try {
+      // Fetch wallet balance and token holdings from MetaMask
+      const { ethBalance, holdings } = await this.getWalletBalance(walletAddress, providerUrl, tokenAddresses);
 
-  // Fetch the user's portfolio with current USD values
-  async getPortfolio(userId: string) {
-    const portfolio = this.portfolios.get(userId);
-    if (!portfolio) {
-      throw new Error('Portfolio not found for the given user');
+      const portfolio = {
+        publicAddress: walletAddress,
+        holdings,
+        ethBalance,
+      };
+
+      return portfolio;
+    } catch (error) {
+      throw new Error('Error fetching portfolio from MetaMask wallet: ' + error.message);
     }
-    return portfolio;
   }
 
-  // Calculate the total portfolio value in USD
-  async calculatePortfolioValue(userId: string): Promise<number> {
-    const portfolio = await this.getPortfolio(userId);
-    const prices = await this.getCryptoPrices();
-
-    let totalValue = 0;
-    for (const holding of portfolio.holdings) {
-      const price = prices[holding.symbol]?.usd || 0;
-      totalValue += holding.amount * price;
+  async calculatePortfolioValue(
+    userId: string,
+    walletAddress: string,
+    providerUrl: string,
+    tokenAddresses: string[]
+  ): Promise<number> {
+    try {
+      const portfolio = await this.getPortfolio(userId, walletAddress, providerUrl, tokenAddresses);
+      console.log("Portfolio: " + JSON.stringify(portfolio));
+  
+      let totalValue = 0;
+  
+      // Use the USD value directly from the portfolio's holdings
+      for (const holding of portfolio.holdings) {
+        totalValue += holding.usdValue || 0;
+      }
+  
+      // Add ETH balance to portfolio value  
+      return totalValue;
+    } catch (error) {
+      throw new Error('Error calculating portfolio value: ' + error.message);
     }
-    return totalValue;
+  }
+  
+  // Get wallet balance and update portfolio with token balances from MetaMask
+  async getWalletBalance(walletAddress: string, providerUrl: string, tokenAddresses: string[]) {
+    const provider = new ethers.providers.JsonRpcProvider(providerUrl);
+    const ethBalance = await this.getEthBalance(walletAddress, provider);
+
+    const holdings = [];
+    for (const tokenAddress of tokenAddresses) {
+      const tokenBalance = await this.getTokenBalance(walletAddress, tokenAddress, provider);
+      holdings.push({
+        symbol: tokenAddress, // This should map to the token's symbol after fetching from an API or contract
+        amount: tokenBalance,
+        token: tokenAddress,
+        balance: tokenBalance,
+        usdValue: 0, // USD value will be populated after fetching prices
+      });
+    }
+
+    return { ethBalance, holdings };
   }
 
-  // Fetch the current crypto prices (BTC and ETH) from CoinGecko API
+  // Fetch current crypto prices
   private async getCryptoPrices(): Promise<any> {
     try {
       const { data } = await axios.get(
-        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd',
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,litecoin,ripple&vs_currencies=usd'
       );
-      return {
-        BTC: data.bitcoin,
-        ETH: data.ethereum,
-      };
+      return data;
     } catch (error) {
-      throw new Error('Error fetching crypto prices');
+      throw new Error('Error fetching crypto prices: ' + error.message);
     }
   }
 
-  // Fetch the balance of a specific ERC-20 token from MetaMask wallet
+  // Get token balance from the contract
   private async getTokenBalance(walletAddress: string, tokenAddress: string, provider: ethers.providers.JsonRpcProvider): Promise<number> {
     const tokenContract = new ethers.Contract(tokenAddress, [
       "function balanceOf(address owner) view returns (uint256)"
@@ -53,40 +87,9 @@ export class PortfolioService {
     return parseFloat(ethers.utils.formatUnits(balance, 18)); // Assuming 18 decimal places for the token
   }
 
-  // Fetch the Ethereum (ETH) balance from MetaMask wallet
+  // Get Ethereum (ETH) balance from the provider
   private async getEthBalance(walletAddress: string, provider: ethers.providers.JsonRpcProvider): Promise<number> {
     const balance = await provider.getBalance(walletAddress);
     return parseFloat(ethers.utils.formatEther(balance));
-  }
-
-  // Store or update the user's portfolio based on their MetaMask data
-  async updatePortfolio(userId: string, walletAddress: string, providerUrl: string, tokenAddresses: string[]) {
-    // Initialize provider (using Infura, Alchemy, or any other Ethereum node provider)
-    const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-
-    // Fetch Ethereum balance
-    const ethBalance = await this.getEthBalance(walletAddress, provider);
-
-    // Fetch ERC-20 token balances
-    const holdings = [];
-    for (const tokenAddress of tokenAddresses) {
-      const tokenBalance = await this.getTokenBalance(walletAddress, tokenAddress, provider);
-      holdings.push({
-        symbol: tokenAddress, // You may want to map this to the token's symbol, e.g., "BTC"
-        amount: tokenBalance,
-        token: tokenAddress,
-        balance: tokenBalance,
-        usdValue: 0, // USD value will be populated after fetching prices
-      });
-    }
-
-    // Store portfolio data
-    const portfolio = {
-      publicAddress: walletAddress,
-      holdings,
-    };
-
-    this.portfolios.set(userId, portfolio);
-    return { message: 'Portfolio updated successfully' };
   }
 }
