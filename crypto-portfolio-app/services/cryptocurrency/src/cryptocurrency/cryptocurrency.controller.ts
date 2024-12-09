@@ -23,6 +23,8 @@ export class CryptocurrencyController {
     @Query('symbol') symbol: string,
     @Query('range') range: string,
   ) {
+    console.log('Received symbol:', symbol, 'Range:', range);
+
     return await this.cryptoService.getHistoricalPrices(symbol, range);
   }
 }

@@ -111,4 +111,24 @@ export class WorkflowService {
       );
     }
   }
+
+  async getCryptoHistory(symbol: string, range: string): Promise<any> {
+    try {
+      const url = `${this.cryptoServiceUrl}/historical`;
+      console.log(`Requesting historical data from CryptoService: ${url}`);
+
+      const response = await axios.get(url, {
+        params: { symbol, range },
+      });
+
+      console.log('Received response from CryptoService:', response.data);
+      return response.data; // Return the data as is
+    } catch (error) {
+      console.error('Error in WorkflowService (getCryptoHistory):', error.message);
+      throw new HttpException(
+        error.response?.data?.message || 'Failed to fetch cryptocurrency history',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

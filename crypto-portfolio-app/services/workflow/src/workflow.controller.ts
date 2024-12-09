@@ -77,4 +77,19 @@ export class WorkflowController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+
+  @Get('crypto/historical')
+  async getCryptoHistory(
+    @Query('symbol') symbol: string,
+    @Query('range') range: string,
+  ) {
+    console.log(`Received request for historical data: symbol=${symbol}, range=${range}`);
+    try {
+      return await this.workflowService.getCryptoHistory(symbol, range);
+    } catch (error) {
+      console.error('Error in WorkflowController (getCryptoHistory):', error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }

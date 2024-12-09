@@ -33,4 +33,10 @@ export const signup = async (data) => apiClient.post('/workflow/signup', data);
 export const login = async (data) => apiClient.post('/workflow/login', data);
 export const updatePassword = async (data) => apiClient.post('/workflow/password', data);
 
+export const getCryptoHistory = async (symbol, range) =>
+  apiClient.get('/workflow/crypto/historical', {
+    params: { symbol, range },
+  });
+
+
 export default apiClient;
