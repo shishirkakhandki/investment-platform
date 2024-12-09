@@ -15,15 +15,20 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await loginApi(credentials); // Use the API function from api.js
+      const response = await loginApi(credentials); // Attempt the API login
       console.log('API response:', response);
       setUserId(credentials.userId);
-      console.log('Setting userId in localStorage:', credentials.userId);
-      localStorage.setItem('userId', credentials.userId); // Store in localStorage
-      return true;
+      localStorage.setItem('userId', credentials.userId); // Store userId in localStorage
+      return true; // Login successful
     } catch (error) {
-      console.error('Login failed', error);
-      return false;
+      if (error.response && error.response.status === 401) {
+        // Handle specific 401 Unauthorized error
+        console.error('Login failed: Invalid credentials');
+      } else {
+        // Handle other types of errors
+        console.error('Login failed: An unexpected error occurred', error);
+      }
+      return false; // Login failed
     }
   };
 

@@ -1,9 +1,11 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Get, Param, Logger } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  private readonly logger = new Logger(UserController.name);
+
 
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
@@ -29,13 +31,28 @@ export class UserController {
   @Post('login')
   async login(
     @Body() body: { userId: string; password: string },
-  ): Promise<{ token: string }> {
+  ): Promise<{ token: string } | { message: string }> {
     const { userId, password } = body;
-    const token = await this.userService.validateUser(userId, password);
-    if (!token) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+
+    try {
+      const token = await this.userService.validateUser(userId, password);
+      if (!token) {
+        this.logger.warn(`Login failed for user: ${userId}`);
+        throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      }
+      return { token };
+    } catch (error) {
+      // Handle unexpected errors and log them
+      if (error instanceof HttpException) {
+        throw error; // Pass through known exceptions
+      }
+
+      this.logger.error('Unexpected error during login', error.stack);
+      throw new HttpException(
+        'An unexpected error occurred',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    return { token };
   }
 
   @Put('password')
