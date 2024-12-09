@@ -1,3 +1,4 @@
+// src/user/user.controller.ts
 import {
   Controller,
   Post,
@@ -8,8 +9,10 @@ import {
   Get,
   Param,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Import the JWT guard
 
 @Controller('user')
 export class UserController {
@@ -17,6 +20,7 @@ export class UserController {
   private readonly logger = new Logger(UserController.name);
 
   @Get(':userId')
+  @UseGuards(JwtAuthGuard) // Use the JWT Auth Guard
   async getUser(@Param('userId') userId: string) {
     const user = await this.userService.getUserById(userId);
     if (!user) {
@@ -51,9 +55,8 @@ export class UserController {
       }
       return { token };
     } catch (error) {
-      // Handle unexpected errors and log them
       if (error instanceof HttpException) {
-        throw error; // Pass through known exceptions
+        throw error;
       }
 
       this.logger.error('Unexpected error during login', error.stack);
@@ -65,6 +68,7 @@ export class UserController {
   }
 
   @Put('password')
+  @UseGuards(JwtAuthGuard) // Protect this route with JWT guard
   async updatePassword(
     @Body() body: { userId: string; oldPassword: string; newPassword: string },
   ) {
