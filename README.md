@@ -1,11 +1,11 @@
 # Crypto Portfolio App
 
 ## Overview
-The **Crypto Portfolio App** is a full-stack investment platform built using React, Node.js, and microservices. It allows users to sign up, log in, connect their MetaMask wallet, and track their investment portfolio. The platform fetches real-time cryptocurrency prices and price movements, and displays this data in a user-friendly dashboard.
+The **Crypto Portfolio App** is a full-stack investment platform built using Next.js for the frontend and NestJS for the backend. It enables users to sign up, log in, connect their MetaMask wallet, and track their cryptocurrency portfolios in real-time. The platform provides a clean, responsive dashboard and integrates with external APIs for live cryptocurrency data.
 
 ## Features
 
-### Frontend Features (React)
+### Frontend Features (Next.js)
 1. **User Authentication:**
    - Users can sign up, log in, and manage their passwords.
    - JWT is used for authentication and session management.
@@ -22,7 +22,7 @@ The **Crypto Portfolio App** is a full-stack investment platform built using Rea
    - The app is designed to be responsive, using Material-UI for consistent styling across different screen sizes.
    - Reusable components to maintain a clean, intuitive interface.
 
-### Backend Features (Node.js/Express Microservices)
+### Backend Features (NestJS Microservices)
 1. **API Endpoints:**
    - RESTful APIs for user signup, login, and fetching cryptocurrency data.
    - Endpoints for portfolio management and user authentication.
